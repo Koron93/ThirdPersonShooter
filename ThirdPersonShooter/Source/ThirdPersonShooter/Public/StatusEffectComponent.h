@@ -19,13 +19,14 @@ public:
 
 protected:
 	// Called when the game starts
-	virtual void BeginPlay() override; 
-	UPROPERTY(BlueprintReadOnly, Category = "Status Effect")
-	TArray<UStatusEffect*> ActiveEffects;
+	virtual void BeginPlay() override;
 
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Status Effect")
+	TArray<UStatusEffect*> ActiveEffects;
 
 	UFUNCTION(BlueprintCallable, Category = "StatusEffect")
 	FName RemoveEffect(int i);
