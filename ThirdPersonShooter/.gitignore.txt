@@ -1,80 +1,21 @@
- Unreal Engine 5 specific .gitignore
-
-# Unreal Engine project folders #
-[Bb]uild/
-[Bb]uilds/
+# Build folders
 Binaries/
-DerivedDataCache/
+Build/
 Intermediate/
 Saved/
-Plugins/*/Intermediate/*
-Crashes/
-Autosaves/
 
-# Exceptions
-!Build/*/PakBlacklist*.txt
-!Build/**/*.ico
-
-# Thumbnails
-Thumbnails/
-
-# Shader working directory
-*.usf.log
-*.ush.log
-
-# Generated project files (Visual Studio, XCode, etc.)
-*.sln
+# Project files
 *.xcodeproj
-*.xcworkspace
-*.uplugin
+*.sln
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.VC.opendb
+
+# User-specific files
 *.user
 *.userprefs
-*.pyc
-*.pyo
-*.pyd
-*.swp
-*.bak
-*.tmp
-*.temp
-*.vs/
-*.vscode/
-.idea/
 *.log
-*.vsconfig
-# User Specific Files
-*.rsuser
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
-# CPP Cache Files
-*.VC.db
-*.opendb
-*.opensdf
-*.sdf
 
-# OS generated files
-
-# Windows specific
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-*.cab
-*.msi
-*.msm
-*.msp
-*.lnk
-
-# macOS specific
-.DS_Store
-.DS_Store?
-.AppleDouble
-.LSOverride
-._*
-.Spotlight-V100
-.DocumentRevisions-V100
-.Trashes
-*.lock
-*.out
-*.gdb
+# Other
+DerivedDataCache/
