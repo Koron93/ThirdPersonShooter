@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "StatusEffectComponent.generated.h"
 
-struct FStatusEffect;
+class UStatusEffect;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class THIRDPERSONSHOOTER_API UStatusEffectComponent : public UActorComponent
@@ -21,7 +21,7 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override; 
 	UPROPERTY(BlueprintReadOnly, Category = "Status Effect")
-	TArray<FStatusEffect> ActiveEffects;
+	TArray<UStatusEffect*> ActiveEffects;
 
 public:	
 	// Called every frame
@@ -31,8 +31,5 @@ public:
 	FName RemoveEffect(int i);
 
 	UFUNCTION(BlueprintCallable, Category = "StatusEffect")
-	FName AddEffect(FStatusEffect effect);
-
-	UFUNCTION(BlueprintCallable, Category = "StatusEffect")
-	void StatusUpdate(float deltaTime, TArray<int32>& DamageAmount, TArray<EDamageTypeEnum>& DamageType, bool& canMove, bool& isBuff);
+	FName AddEffect(UStatusEffect* effect);
 };

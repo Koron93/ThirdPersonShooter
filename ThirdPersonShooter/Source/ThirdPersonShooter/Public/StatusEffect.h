@@ -3,41 +3,34 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DamageTypeEnum.h"
 #include "StatusEffect.generated.h"
 
 /**
  */
 
-USTRUCT(BlueprintType)
-struct THIRDPERSONSHOOTER_API FStatusEffect
+UCLASS(Blueprintable, Abstract)
+class THIRDPERSONSHOOTER_API UStatusEffect : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status Effect")
+	UPROPERTY(BlueprintReadWrite, Category = "Status Effect")
 	FName EffectName;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status Effect")
-	EDamageTypeEnum DamageType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status Effect")
+	UPROPERTY(BlueprintReadWrite, Category = "Status Effect")
 	float Duration;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status Effect")
 	float CountDown;
 
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status Effect")
+	UPROPERTY(BlueprintReadWrite, Category = "Status Effect")
 	bool bIsBuff;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status Effect")
-	int32 DamageOverDuration;
+	UStatusEffect();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status Effect")
-	bool bCanMove;
+	virtual ~UStatusEffect() override;
 
-	FStatusEffect(): EffectName(NAME_None), Duration(0.0f), CountDown(0.0f), bIsBuff(true), DamageOverDuration(0), bCanMove(true) {}
-
-	~FStatusEffect(){}
+protected:
+	UFUNCTION(BlueprintCallable, Category = "Status Effect")
+	virtual void UpdateEffect(float deltaTime, UStatusEffect*& effect);
 };

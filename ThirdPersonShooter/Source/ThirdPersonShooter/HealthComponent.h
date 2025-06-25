@@ -7,17 +7,6 @@
 #include "DamageTypeEnum.h"
 #include "HealthComponent.generated.h"
 
-//UENUM(BlueprintType)
-//enum class ADamageType : uint8
-//{
-//	Bullet,
-//	Gravity,
-//	Blunt,
-//	Explosive,
-//	Unknown
-//};
-
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDeathDelegate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -39,10 +28,10 @@ protected:
 	int32 MaxShield = 100;
 
 	UPROPERTY(Category = "Health", BlueprintReadWrite)
-	int32 Health;
+	int32 Health = 0;
 
 	UPROPERTY(Category = "Health", BlueprintReadWrite)
-	int32 Shield;
+	int32 Shield = 0;
 
 	UPROPERTY(Category = "Health", BlueprintReadWrite)
 	bool bHasShield = true;
