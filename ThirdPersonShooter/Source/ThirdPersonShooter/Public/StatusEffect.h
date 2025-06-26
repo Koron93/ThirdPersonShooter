@@ -8,6 +8,9 @@
 /**
  */
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStatusApplied);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStatusRemoved);
+
 UCLASS(Blueprintable, Abstract)
 class THIRDPERSONSHOOTER_API UStatusEffect : public UObject
 {
@@ -26,9 +29,27 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Status Effect")
 	bool bIsBuff;
 
+	UPROPERTY(BlueprintReadWrite, Category = "Status Effect")
+	AActor* AffectedTarget;
+
+	UPROPERTY(BlueprintAssignable, Category = "Status Effect")
+	FStatusApplied StatusApplied;
+
+	UPROPERTY(BlueprintAssignable, Category = "Status Effect")
+	FStatusRemoved StatusDismantled;
+
+	UFUNCTION(BlueprintCallable, Category = "Status Effect")
+	void InitializeEffect(AActor* TargetActor);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Status Effect")
+	void OnEffectInitialized();
+
 	UStatusEffect();
 
 	virtual ~UStatusEffect() override;
+
+	UFUNCTION(BlueprintCallable, Category = "Status Effect")
+	virtual void StartEffect();
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = "Status Effect")

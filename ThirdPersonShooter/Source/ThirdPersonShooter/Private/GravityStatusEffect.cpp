@@ -13,7 +13,8 @@ UGravityStatusEffect::UGravityStatusEffect()
 
 UGravityStatusEffect::~UGravityStatusEffect()
 {
-
+	StatusApplied.Clear();
+	StatusDismantled.Clear();
 }
 
 void UGravityStatusEffect::UpdateEffect(float deltaTime, UStatusEffect*& effect)
@@ -23,6 +24,12 @@ void UGravityStatusEffect::UpdateEffect(float deltaTime, UStatusEffect*& effect)
 
 	if (CountDown <= 0)
 	{
+		StatusDismantled.Broadcast();
+
 		effect = this;
 	}
+}
+void UGravityStatusEffect::StartEffect()
+{
+	StatusApplied.Broadcast();
 }

@@ -16,6 +16,8 @@ public:
 
 	virtual void UpdateEffect(float deltaTime, UStatusEffect*& effect) override;
 
+	virtual void StartEffect() override;
+
 private:
 	~UGravityStatusEffect();
 

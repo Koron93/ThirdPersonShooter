@@ -16,7 +16,8 @@ UPoisonStatusEffect::UPoisonStatusEffect()
 
 UPoisonStatusEffect::~UPoisonStatusEffect()
 {
-
+	StatusDismantled.Clear();
+	StatusApplied.Clear();
 }
 
 void UPoisonStatusEffect::UpdateEffect(float deltaTime, UStatusEffect*& effect)
@@ -28,11 +29,18 @@ void UPoisonStatusEffect::UpdateEffect(float deltaTime, UStatusEffect*& effect)
 	if (TickAccumulator >= DamageTickRate)
 	{
 		TickAccumulator = 0.0f;
-		OnPoisonApplied.Broadcast(DamagePerUpdate);
+		StatusApplied.Broadcast();
 	}
 
 	if (CountDown <= 0)
 	{
+		StatusDismantled.Broadcast();
+
 		effect = this;
 	}
+}
+
+void UPoisonStatusEffect::StartEffect()
+{
+
 }

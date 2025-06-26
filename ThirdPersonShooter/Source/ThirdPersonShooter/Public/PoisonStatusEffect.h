@@ -6,8 +6,6 @@
 #include "StatusEffect.h"
 #include "PoisonStatusEffect.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPoisonDelegate, int32, Damage);
-
 UCLASS()
 class THIRDPERSONSHOOTER_API UPoisonStatusEffect : public UStatusEffect
 {
@@ -18,8 +16,7 @@ public:
 
 	virtual void UpdateEffect(float deltaTime, UStatusEffect*& effect) override;
 
-	UPROPERTY(BlueprintAssignable, Category = "Poison")
-	FPoisonDelegate OnPoisonApplied;
+	virtual void StartEffect() override;
 
 private:
 	float TickAccumulator;
