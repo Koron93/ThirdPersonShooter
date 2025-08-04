@@ -6,6 +6,8 @@
 #include "StatusEffect.h"
 #include "PoisonStatusEffect.generated.h"
 
+class UHealthComponent;
+
 UCLASS()
 class THIRDPERSONSHOOTER_API UPoisonStatusEffect : public UStatusEffect
 {
@@ -32,4 +34,7 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, Category = "Poison")
 	float DamageTickRate;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Poison")
+	UHealthComponent* HealthComponent;
 };

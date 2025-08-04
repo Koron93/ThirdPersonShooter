@@ -12,6 +12,7 @@ UPoisonStatusEffect::UPoisonStatusEffect()
 	DamageTickRate = 1.0f;
 	TickAccumulator = 0;
 	DamagePerUpdate = FMath::RoundToInt32(DamageOverTime / Duration);
+	HealthComponent = nullptr;
 }
 
 UPoisonStatusEffect::~UPoisonStatusEffect()

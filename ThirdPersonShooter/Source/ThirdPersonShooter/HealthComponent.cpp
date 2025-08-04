@@ -56,6 +56,11 @@ void UHealthComponent::TakeDamage(int32 Damage, EDamageTypeEnum damagetype)
 	{
 		break;
 	}
+	case::EDamageTypeEnum::Poison:
+	{
+		DamageToApplie = Damage;
+		break;
+	}
 	default:
 	{
 		DamageToApplie = Damage;
@@ -67,9 +72,9 @@ void UHealthComponent::TakeDamage(int32 Damage, EDamageTypeEnum damagetype)
 
 	if (Health <= 0)
 	{
+		bIsAlive = false;
 		DeathEvent.Broadcast();
 	}
-
 }
 
 void UHealthComponent::TakeShieldDamage(int32 damage, EDamageTypeEnum damagetype)
@@ -92,6 +97,11 @@ void UHealthComponent::TakeShieldDamage(int32 damage, EDamageTypeEnum damagetype
 	}
 	case::EDamageTypeEnum::Gravity:
 	{
+		break;
+	}
+	case::EDamageTypeEnum::Poison:
+	{
+		DamageToApplie = damage;
 		break;
 	}
 	default:

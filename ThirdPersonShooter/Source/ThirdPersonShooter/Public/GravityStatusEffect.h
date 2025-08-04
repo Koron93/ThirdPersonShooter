@@ -6,6 +6,8 @@
 #include "StatusEffect.h"
 #include "GravityStatusEffect.generated.h"
 
+class UCharacterMovementComponent;
+
 UCLASS()
 class THIRDPERSONSHOOTER_API UGravityStatusEffect : public UStatusEffect
 {
@@ -24,5 +26,8 @@ private:
 protected:
 	UPROPERTY(BlueprintReadWrite, Category = "Gravity")
 	float SlowAmount;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Gravity")
+	UCharacterMovementComponent* MovementComponent = nullptr;
 	
 };
