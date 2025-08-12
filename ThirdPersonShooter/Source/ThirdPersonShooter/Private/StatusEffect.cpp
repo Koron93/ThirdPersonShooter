@@ -36,3 +36,9 @@ void UStatusEffect::InitializeEffect(AActor* TargetActor)
 	AffectedTarget = TargetActor;
 	OnEffectInitialized();
 }
+
+void UStatusEffect::InitializeRefresh(AActor* TargetActor)
+{
+	AffectedTarget = TargetActor;
+	OnEffectRefreshed();
+}

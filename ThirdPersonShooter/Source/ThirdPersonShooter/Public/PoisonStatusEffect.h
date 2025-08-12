@@ -30,6 +30,12 @@ protected:
 	int32 DamageOverTime;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Poison")
+	float TotalTime;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Poison")
+	TArray<float> TimeStacks;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Poison")
 	int32 DamagePerUpdate;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Poison")

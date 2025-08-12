@@ -10,6 +10,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStatusApplied);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStatusRemoved);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStatusRefreshed);
 
 UCLASS(Blueprintable, Abstract)
 class THIRDPERSONSHOOTER_API UStatusEffect : public UObject
@@ -38,11 +39,20 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Status Effect")
 	FStatusRemoved StatusDismantled;
 
+	UPROPERTY(BlueprintAssignable, Category = "Status Effect")
+	FStatusRefreshed StatusRefresh;
+
 	UFUNCTION(BlueprintCallable, Category = "Status Effect")
 	void InitializeEffect(AActor* TargetActor);
 
+	UFUNCTION(BlueprintCallable, Category = "Status Effect")
+	void InitializeRefresh(AActor* TargetActor);
+
 	UFUNCTION(BlueprintImplementableEvent, Category = "Status Effect")
 	void OnEffectInitialized();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Status Effect")
+	void OnEffectRefreshed();
 
 	UStatusEffect();
 

@@ -36,15 +36,22 @@ void UStatusEffectComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 FName UStatusEffectComponent::RemoveEffect(int i)
 {
-	FName effect = ActiveEffects[i]->EffectName;
+	FName name = ActiveEffects[i]->EffectName;
+
 	ActiveEffects.RemoveAt(i);
 
-	return effect;
+	return name;
 }
 
-FName UStatusEffectComponent::AddEffect(UStatusEffect* effect)
+UStatusEffect* UStatusEffectComponent::AddEffect(UStatusEffect* effect)
 {
-	ActiveEffects.Add(effect);
+	for (int i = 0; i < ActiveEffects.Num(); i++)
+	{
+		if (ActiveEffects[i]->EffectName != effect->EffectName) continue;
 
-	return effect->EffectName;
+		return ActiveEffects[i];
+	}
+
+	ActiveEffects.Add(effect);
+	return effect;
 }

@@ -32,5 +32,5 @@ public:
 	FName RemoveEffect(int i);
 
 	UFUNCTION(BlueprintCallable, Category = "StatusEffect")
-	FName AddEffect(UStatusEffect* effect);
+	UStatusEffect* AddEffect(UStatusEffect* effect);
 };

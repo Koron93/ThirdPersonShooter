@@ -13,6 +13,8 @@ UPoisonStatusEffect::UPoisonStatusEffect()
 	TickAccumulator = 0;
 	DamagePerUpdate = FMath::RoundToInt32(DamageOverTime / Duration);
 	HealthComponent = nullptr;
+	TotalTime = 0;
+	TimeStacks.Add(Duration);
 }
 
 UPoisonStatusEffect::~UPoisonStatusEffect()
@@ -23,13 +25,25 @@ UPoisonStatusEffect::~UPoisonStatusEffect()
 
 void UPoisonStatusEffect::UpdateEffect(float deltaTime, UStatusEffect*& effect)
 {
-	CountDown -= deltaTime;
+
+	for (float& stack : TimeStacks)
+	{
+		stack += deltaTime;
+	}
+
+	CountDown = TimeStacks.Last();
 	effect = nullptr;
 	TickAccumulator += deltaTime;
+	TotalTime += deltaTime;
+
+	if (TimeStacks[0] <= 0) TimeStacks.RemoveAt(0);
+
 
 	if (TickAccumulator >= DamageTickRate)
 	{
+
 		TickAccumulator = 0.0f;
+
 		StatusApplied.Broadcast();
 	}
 

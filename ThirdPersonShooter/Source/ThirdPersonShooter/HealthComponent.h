@@ -9,6 +9,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDeathDelegate);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDamage, int32, DamageAmount, EDamageTypeEnum, DamageType);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class THIRDPERSONSHOOTER_API UHealthComponent : public UActorComponent
 {
@@ -51,5 +53,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Health")
 	FDeathDelegate DeathEvent;
+
+	UPROPERTY(BlueprintAssignable, Category = "Health")
+	FDamage DamageEvent;
 		
 };
