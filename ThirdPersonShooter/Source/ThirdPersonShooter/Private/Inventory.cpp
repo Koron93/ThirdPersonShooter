@@ -10,6 +10,7 @@ UInventory::UInventory()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
+	WeaponSwitch = 0;
 	// ...
 }
 
@@ -28,49 +29,61 @@ void UInventory::BeginPlay()
 void UInventory::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
 	// ...
 }
 
-void UInventory::AddItem(ItemBase* itemToAdd)
+void UInventory::AddItem(UItemBase* itemToAdd, UItemBase*& itemthatsAdded)
 {
-	if (_Inventory.Contains(itemToAdd))
-	{
+	if (itemToAdd != nullptr) {
+		itemthatsAdded = itemToAdd;
 		_Inventory.Add(itemToAdd);
 	}
 }
 
-void UInventory::RemoveItem(ItemBase* itemToRemove)
+void UInventory::RemoveItem(UItemBase* itemToRemove)
 {
 	if (_Inventory.Contains(itemToRemove))
 	{
 		_Inventory.Remove(itemToRemove);
+		itemToRemove->ConditionalBeginDestroy();
 	}
 }
 
-bool UInventory::EquipItem(ItemBase* itemToEquip, int i)
+bool UInventory::EquipItem(UItemBase* itemToEquip, int i)
 {
-	ItemBase* ItemBeingMoved;
-	if (!itemToEquip || i < 0 || i >= 10)
+	UItemBase* ItemBeingMoved;
+	if (i < 0 || i > 10)
 	{
 		return false;
 	}
-	else if (i > 8 && i < 10) 
+	else if (i >= 8 && i <= 10)
 	{
-		if (i != 9)
+		if (i == 8)
 		{
 			ItemBeingMoved = MainWeapon;
 			MainWeapon = itemToEquip;
-			_Inventory.Add(MainWeapon);
+			_Inventory.Remove(itemToEquip);
+			_Inventory.Add(ItemBeingMoved);
+
 			return true;
 		}
-		else 
+		else if(i == 10)
+		{
+			ItemBeingMoved = SideArm;
+			SideArm = itemToEquip;
+			_Inventory.Remove(itemToEquip);
+			_Inventory.Add(ItemBeingMoved);
+
+			return true;
+		}
+		else
 		{
 			ItemBeingMoved = Armor;
 			Armor = itemToEquip;
+			_Inventory.Remove(itemToEquip);
 			_Inventory.Add(ItemBeingMoved);
 
-				return true;
+			return true;
 		}
 	}
 
@@ -86,22 +99,31 @@ bool UInventory::EquipItem(ItemBase* itemToEquip, int i)
 	return true;
 }
 
-ItemBase* UInventory::UseWeapon()
+UItemBase* UInventory::UseWeapon()
 {
-	return MainWeapon;
+	switch (WeaponSwitch)
+	{
+	case 1:
+	{
+		 return MainWeapon;
+	}
+	case 2:
+	{
+		return SideArm;
+	}
+	default:
+	{
+		return nullptr;
+	}
+	}
 }
 
-ItemBase* UInventory::UseArmor()
+UItemBase* UInventory::UseArmor()
 {
 	return Armor;
 }
 
-ItemBase* UInventory::UseSideArm()
-{
-	return SideArm;
-}
-
-ItemBase* UInventory::UseStim()
+UItemBase* UInventory::UseStim()
 {
 	if (ItemSlots[0] != nullptr) return ItemSlots[0];
 	else if (ItemSlots[1] != nullptr) return ItemSlots[1];
@@ -111,7 +133,7 @@ ItemBase* UInventory::UseStim()
 	return nullptr;
 }
 
-ItemBase* UInventory::UseGrenade()
+UItemBase* UInventory::UseGrenade()
 {
 	if (ItemSlots[0] != nullptr) return ItemSlots[4];
 	else if (ItemSlots[1] != nullptr) return ItemSlots[5];

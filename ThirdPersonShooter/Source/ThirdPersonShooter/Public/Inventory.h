@@ -26,30 +26,42 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void AddItem(ItemBase* itemToAdd);
+	UFUNCTION(BlueprintCallable, Category = "UseItem")
+	void AddItem(UItemBase* itemToAdd, UItemBase*& itemthatsAdded);
 
-	void RemoveItem(ItemBase* itemToRemove);
+	UFUNCTION(BlueprintCallable, Category = "UseItem")
+	void RemoveItem(UItemBase* itemToRemove);
 
-	bool EquipItem(ItemBase* itemToEquip, int i);
+	UFUNCTION(BlueprintCallable, Category = "UseItem")
+	bool EquipItem(UItemBase* itemToEquip, int i);
 
-	ItemBase* UseWeapon();
+	UFUNCTION(BlueprintCallable, Category = "UseItem")
+	UItemBase* UseWeapon();
 
-	ItemBase* UseSideArm();
+	UFUNCTION(BlueprintCallable, Category = "UseItem")
+	UItemBase* UseArmor();
 
-	ItemBase* UseArmor();
+	UFUNCTION(BlueprintCallable, Category = "UseItem")
+	UItemBase* UseStim();
 
-	ItemBase* UseStim();
+	UFUNCTION(BlueprintCallable, Category = "UseItem")
+	UItemBase* UseGrenade();
 
-	ItemBase* UseGrenade();
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Items")
+	TArray<UItemBase*> _Inventory;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Items")
+	TArray<UItemBase*> ItemSlots;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Items")
+	UItemBase* MainWeapon;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Items")
+	UItemBase* Armor;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Items")
+	UItemBase* SideArm;
 
 private:
-	TArray<ItemBase*> _Inventory;
-
-	TArray<ItemBase*> ItemSlots;
-
-	ItemBase* MainWeapon;
-
-	ItemBase* Armor;
-
-	ItemBase* SideArm;
+	int WeaponSwitch;
 };

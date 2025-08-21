@@ -3,11 +3,29 @@
 
 #include "ItemBase.h"
 
-ItemBase::ItemBase()
+UItemBase::UItemBase()
 {
 	Type = EItemType::None;
+
+	Mesh = nullptr;
+
+	Name = "item";
+
+	FlavorText = "base item";
 }
 
-ItemBase::~ItemBase()
+UItemBase::~UItemBase()
 {
+	Type = EItemType::None;
+
+	Mesh = nullptr;
+
+	Name = "item";
+
+	FlavorText = "base item";
+}
+
+void UItemBase::UseItem()
+{
+
 }
