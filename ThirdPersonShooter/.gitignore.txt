@@ -1,21 +1,58 @@
-# Build folders
+# Project-specific files
+*.sln
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+*.xcodeproj
+*.xcworkspace
+*.xcuserstate
+
+# Binaries and Intermediate
 Binaries/
-Build/
+DerivedDataCache/
 Intermediate/
 Saved/
+.vscode/
 
-# Project files
-*.xcodeproj
-*.sln
-*.sdf
-*.opensdf
-*.VC.db
-*.VC.VC.opendb
+# Build folders
+Build/
 
-# User-specific files
-*.user
-*.userprefs
+# Ignore Mac system files
+.DS_Store
+
+# Ignore Windows thumbnail cache
+Thumbs.db
+
+# Ignore log files
 *.log
 
-# Other
-DerivedDataCache/
+# Compiled object files
+*.obj
+*.pdb
+*.exe
+*.dll
+*.app
+*.lib
+
+# Ignore crash reports
+CrashReportClient/
+
+# Ignore Unreal-specific user settings
+*.user
+*.userprefs
+*.orig
+
+# Ignore Visual Studio Code workspace
+*.code-workspace
+
+# Ignore plugin binaries
+Plugins/*/Binaries/
+Plugins/*/Intermediate/
+
+# Ignore asset registry cache
+AssetRegistry.bin
+
+# Ignore configuration backups
+Config/*.ini~
