@@ -15,6 +15,7 @@ DerivedDataCache/
 Intermediate/
 Saved/
 .vscode/
+.vs/
 
 # Build folders
 Build/
