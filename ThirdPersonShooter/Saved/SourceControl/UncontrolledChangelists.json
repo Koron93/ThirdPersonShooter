@@ -1,0 +1,16 @@
+{
+	"version": 1,
+	"changelists": [
+		{
+			"guid": "00000000000000000000000000000000",
+			"description": "Default Uncontrolled Changelist",
+			"files": [
+				"C:/Users/Tanso/OneDrive/Dokument/GitHub/ThirdPersonShooter/ThirdPersonShooter/Content/ThirdPerson/Blueprints/BP_ThirdPersonCharacter.uasset",
+				"C:/Users/Tanso/OneDrive/Dokument/GitHub/ThirdPersonShooter/ThirdPersonShooter/Content/AI/Insect_AI_Controller.uasset",
+				"C:/Users/Tanso/OneDrive/Dokument/GitHub/ThirdPersonShooter/ThirdPersonShooter/Content/AI/BT_Base_AI.uasset",
+				"C:/Users/Tanso/OneDrive/Dokument/GitHub/ThirdPersonShooter/ThirdPersonShooter/Content/AI/BTTask_BlueprintBase_Leap.uasset",
+				"C:/Users/Tanso/OneDrive/Dokument/GitHub/ThirdPersonShooter/ThirdPersonShooter/Content/AI/BTTask_Attack.uasset"
+			]
+		}
+	]
+}
