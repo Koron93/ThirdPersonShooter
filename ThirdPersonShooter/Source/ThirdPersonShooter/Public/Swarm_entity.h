@@ -7,16 +7,18 @@
 #include "Swarm_entity.generated.h"
 
 UENUM(BlueprintType)
-enum BehaviorState : uint8
+enum class EBehaviorState : uint8
 {
-	Hungry,
-	Thirsty,
 	Sleepy,
-	Patroling
+	Patroling,
+	Hunting,
+	Eating,
+	Drinking,
+	Dead
 };
 
 UCLASS()
-class THIRDPERSONSHOOTER_API ASwarm_entity : public ACharacter
+class THIRDPERSONSHOOTER_API ASwarm_entity : public AActor
 {
 	GENERATED_BODY()
 
@@ -32,11 +34,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	UPROPERTY(BlueprintReadWrite)
-	TEnumAsByte<BehaviorState> CurrentState;
+	EBehaviorState CurrentState;
 
 	UPROPERTY(BlueprintReadWrite)
 	float Hunger;
@@ -47,6 +46,33 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	float Rested;
 
+	UFUNCTION()
+	void UpdateEntity(const FVector& NewVelocity);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Attack();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Sleep();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Eat();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Drink();
+
+	UPROPERTY(EditAnywhere)
+	float SleepAnimation;
+
+	UPROPERTY(EditAnywhere)
+	float EatAnimation;
+
+	UPROPERTY(EditAnywhere)
+	float DrinkAnimation;
+
+	FVector GetVelocity() const { return Velocity; }
+	void SetVelocity(const FVector& newVel) { Velocity = newVel; }
+
 private:
 	UFUNCTION()
 	void CalcValues();
@@ -54,6 +80,17 @@ private:
 	UFUNCTION()
 	void HandleTimer();
 
+	UFUNCTION()
+	void HandleAnimtation();
+
+	UFUNCTION()
+	void AnimationTimer();
+
 	FTimerHandle EntityTimerHandle;
 
+	FTimerHandle EntityAnimationTime;
+
+	FVector Velocity;
+	const float WalkingVelocity = 200.f;
+	const float RunningVelocity = 800.f;
 };
