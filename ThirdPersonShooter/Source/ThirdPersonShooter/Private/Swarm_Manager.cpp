@@ -36,7 +36,74 @@ void ASwarm_Manager::Tick(float DeltaTime)
 	for (ASwarm_entity* Boid : Boids)
 	{
 		if (!Boid) continue;
+		FVector boidLocation = Boid->GetActorLocation();
+		FVector start = boidLocation + Boid->GetActorForwardVector() * 200.f + FVector(0, 0, 50);
+		FVector endLeft = boidLocation + Boid->GetActorForwardVector() + Boid->GetActorRightVector() * -200 + FVector(0, 0, 50);
+		FVector endRight = boidLocation + Boid->GetActorForwardVector() + Boid->GetActorRightVector() * 200 + FVector(0, 0, 50);
 
+		FHitResult hitLeft, hitRight;
+		bool bIsHitLeft = GetWorld()->LineTraceSingleByChannel(hitLeft, start, endLeft, ECC_Visibility);
+		bool bIsHitRight = GetWorld()->LineTraceSingleByChannel(hitRight, start, endRight, ECC_Visibility);
+
+		DrawDebugLine(
+			GetWorld(),
+			start,
+			endLeft,
+			FColor::Green,
+			false,
+			0.1f,
+			0,
+			2.0f
+		);
+
+		DrawDebugLine(
+			GetWorld(),
+			start,
+			endRight,
+			FColor::Green,
+			false,
+			0.1f,
+			0,
+			2.0f
+		);
+
+		FVector objectDistance = FVector(0,0,0);
+
+		if (bIsHitLeft)
+		{
+			objectDistance += hitLeft.ImpactPoint - boidLocation;
+
+			DrawDebugSphere(
+				GetWorld(),
+				hitLeft.ImpactPoint,
+				10.f,
+				2,
+				FColor::Red,
+				false,
+				2.f
+			);
+		}
+
+		if (bIsHitRight)
+		{
+			objectDistance -= hitRight.ImpactPoint - boidLocation;
+
+			DrawDebugSphere(
+				GetWorld(),
+				hitRight.ImpactPoint,
+				10.f,
+				2,
+				FColor::Red,
+				false,
+				2.f
+			);
+		}
+
+		if (Boid->CurrentState != EBehaviorState::Hunting)
+		{
+			if (Boid->Thirst <= 0) Boid -> CurrentState = EBehaviorState::Drinking;
+			else if (Boid->Hunger <= 0) Boid->CurrentState = EBehaviorState::Eating;
+		}
 		//UE_LOG(LogTemp, Warning, TEXT("Boid state: %s"), *UEnum::GetValueAsString(Boid->CurrentState));
 
 		switch (Boid->CurrentState)
@@ -84,14 +151,15 @@ void ASwarm_Manager::Tick(float DeltaTime)
 
 				Separation = Separation.GetSafeNormal();
 
+				FVector ToCenter = (GetActorLocation() - BoidLocation).GetSafeNormal();
+
 				FVector NewVelocity =
 					Boid->GetVelocity() +
 					Cohesion * CohesionWeight +
 					Alignment * AlignmentWeight +
-					Separation * SeparationWeight;
-
-				FVector ToCenter = (GetActorLocation() - BoidLocation).GetSafeNormal();
-				NewVelocity += ToCenter.GetSafeNormal() * GlobalCohesionWeight;
+					Separation * SeparationWeight +
+					(ToCenter.GetSafeNormal() * GlobalCohesionWeight) +
+					objectDistance;
 
 				NewVelocity.Z = 0;
 				Boid->UpdateEntity(NewVelocity);
@@ -104,12 +172,8 @@ void ASwarm_Manager::Tick(float DeltaTime)
 				{
 					if (NewVelocity.IsNearlyZero())
 					{
-						NewVelocity = FMath::VRand() * 100.f;
-					}
-
-					FVector ToCenter = (GetActorLocation() - BoidLocation).GetSafeNormal();
-					if (!ToCenter.IsNearlyZero())
-					{
+						FVector ToCenter = (GetActorLocation() - BoidLocation).GetSafeNormal();
+						NewVelocity = (FMath::VRand() * 100.f) +
 						NewVelocity += ToCenter.GetSafeNormal() * GlobalCohesionWeight;
 					}
 					NewVelocity.Z = 0;
@@ -128,19 +192,28 @@ void ASwarm_Manager::Tick(float DeltaTime)
 			}
 			break;
 		}
-		case::EBehaviorState::Dead:
+		case::EBehaviorState::Hunting:
 		{
 			FVector BoidLocation = Boid->GetActorLocation();
-
+			Target = Boid->BodyOfIntrest;
 			FVector AvgLocation = FVector::ZeroVector;
 			FVector AvgVelocity = FVector::ZeroVector;
 			FVector Separation = FVector::ZeroVector;
 			int32 NeighborCount = 0;
+			FVector targetLocation = Boid->BodyOfIntrest->GetActorLocation();
+
+			float DistanceToTarget = FMath::Abs(BoidLocation.X - targetLocation.X) + FMath::Abs(BoidLocation.Y - targetLocation.Y);
+			if (DistanceToTarget <= 100)
+			{
+				Boid->AnimationTimer();
+			}
 
 			for (ASwarm_entity* Other : Boids)
 			{
-				if (Other == Boid) continue;
 
+				if (Other == Boid ) continue;
+
+				Boid->BodyOfIntrest = Target;
 				FVector ToOther = Other->GetActorLocation() - BoidLocation;
 				float Distance = ToOther.Size();
 
@@ -158,6 +231,8 @@ void ASwarm_Manager::Tick(float DeltaTime)
 				}
 			}
 
+			FVector NewVelocity;
+
 			if (NeighborCount > 0) // movement if theres a neighbors
 			{
 				AvgLocation /= NeighborCount;
@@ -170,39 +245,106 @@ void ASwarm_Manager::Tick(float DeltaTime)
 
 				Separation = Separation.GetSafeNormal();
 
-				FVector NewVelocity =
+				FVector ToCenter = (targetLocation - BoidLocation).GetSafeNormal();
+
+				NewVelocity =
 					Boid->GetVelocity() +
 					Cohesion * CohesionWeight +
 					Alignment * AlignmentWeight +
-					Separation * SeparationWeight;
-
-				FVector ToCenter = (Target->GetActorLocation() - BoidLocation).GetSafeNormal();
-				if (!ToCenter.IsNearlyZero())
-				{
-					NewVelocity += ToCenter.GetSafeNormal() * GlobalCohesionWeight;
-				}
+					Separation * SeparationWeight +
+					(ToCenter.GetSafeNormal() * GlobalCohesionWeight) * 10 +
+					objectDistance;
 
 				NewVelocity.Z = 0;
 				Boid->UpdateEntity(NewVelocity);
+				//UE_LOG(LogTemp, Warning, TEXT("Boid %s has %d neighbors"), *Boid->GetName(), NeighborCount);
 			}
-			else // if no other movementlogic exists
+			else // if there is no neighbor
 			{
-				FVector NewVelocity = Boid->GetVelocity();
-
-				if (NewVelocity.IsNearlyZero())
-				{
-					NewVelocity = FMath::VRand() * 100.f;
-					NewVelocity.Z = 0;
-				}
-
-				Boid->UpdateEntity(NewVelocity);
+				NewVelocity = (targetLocation - BoidLocation).GetSafeNormal() * 1000;
+				//UE_LOG(LogTemp, Warning, TEXT("Boid %s"), *Boid->GetName());
 			}
+
+			Boid->UpdateEntity(NewVelocity);
+
 			break;
 		}
 		default:
 		{
-			FVector NewVelocity = FVector(0,0,0);
-			Boid->UpdateEntity(NewVelocity);
+			FVector BoidLocation = Boid->GetActorLocation();
+
+			FVector AvgLocation = FVector::ZeroVector;
+			FVector AvgVelocity = FVector::ZeroVector;
+			FVector Separation = FVector::ZeroVector;
+			int32 NeighborCount = 0;
+			FVector targetLocation = Boid->BodyOfIntrest->GetActorLocation();
+
+			float DistanceToTarget = FMath::Abs(BoidLocation.X - targetLocation.X) + FMath::Abs(BoidLocation.Y - targetLocation.Y);
+			if (DistanceToTarget <= 50)
+			{
+				Boid->UpdateEntity(FVector(0, 0, 0));
+				Boid->AnimationTimer();
+			}
+			else
+			{
+
+				for (ASwarm_entity* Other : Boids) 
+				{
+					if (Other == Boid || Other->CurrentState == EBehaviorState::Patroling) continue;
+
+					FVector ToOther = Other->GetActorLocation() - BoidLocation;
+					float Distance = ToOther.Size();
+
+					if (Distance < NeigborRadius)
+					{
+						AvgLocation += Other->GetActorLocation();
+						AvgVelocity += Other->GetVelocity();
+
+						if (Distance < SeperationDistance)
+						{
+							Separation -= ToOther.GetSafeNormal() / Distance;
+						}
+
+						NeighborCount++;
+					}
+				}
+
+				FVector NewVelocity;
+
+				if (NeighborCount > 0) // movement if theres a neighbors
+				{
+
+					AvgLocation /= NeighborCount;
+					AvgVelocity /= NeighborCount;
+
+
+					FVector Cohesion = (AvgLocation - BoidLocation).GetSafeNormal();
+
+					FVector Alignment = (AvgVelocity - Boid->GetVelocity()).GetSafeNormal();
+
+					Separation = Separation.GetSafeNormal();
+
+					FVector ToCenter = (targetLocation - BoidLocation).GetSafeNormal();
+
+					NewVelocity =
+						Boid->GetVelocity() +
+						Cohesion * CohesionWeight +
+						Alignment * AlignmentWeight +
+						Separation * SeparationWeight +
+						(ToCenter.GetSafeNormal() * GlobalCohesionWeight) +
+						objectDistance;
+
+					NewVelocity.Z = 0;
+					Boid->UpdateEntity(NewVelocity);
+					//UE_LOG(LogTemp, Warning, TEXT("Boid %s has %d neighbors"), *Boid->GetName(), NeighborCount);
+				}
+				else
+				{
+					NewVelocity = targetLocation - BoidLocation.GetSafeNormal();
+				}
+
+				Boid->UpdateEntity(NewVelocity);
+			}
 			break;
 		}
 		}

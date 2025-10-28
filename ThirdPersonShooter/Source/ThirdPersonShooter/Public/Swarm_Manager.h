@@ -40,10 +40,10 @@ public:
 private:
 	const int NumberOfBoids = 9;
 	const float BoidSpawnRadius = 400.f;
-	const float NeigborRadius = 250.f;
-	const float SeperationDistance = 200.f;
-	const float CohesionWeight = 0.6f;
+	const float NeigborRadius = 200.f;
+	const float SeperationDistance = 100.f;
+	const float CohesionWeight = 0.5f;
 	const float AlignmentWeight = 0.2f;
-	const float SeparationWeight = 1.3f;
-	const float GlobalCohesionWeight = 1.1f;
+	const float SeparationWeight = 1.6f;
+	const float GlobalCohesionWeight = 1.01f;
 };

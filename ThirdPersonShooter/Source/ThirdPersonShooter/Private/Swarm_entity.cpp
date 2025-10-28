@@ -3,6 +3,7 @@
 
 #include "Swarm_entity.h"
 #include "TimerManager.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ASwarm_entity::ASwarm_entity()
@@ -35,48 +36,53 @@ void ASwarm_entity::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	FVector currentLocation = GetActorLocation();
-	FVector NewLocation = currentLocation + Velocity * DeltaTime;
-	SetActorLocation(NewLocation); //Updated Position
+	FVector newLocation = currentLocation + Velocity * DeltaTime;
+	SetActorLocation(newLocation); //Updated Position
 
 	FVector direction = Velocity.GetSafeNormal();
 	direction.Z = 0;
 
 	if (!direction.IsNearlyZero()) //Applie rotation over time
 	{
+		FRotator newRotation;
+
 		FRotator TargetRotation = direction.Rotation();
 		TargetRotation.Pitch = 0.0f;
 		TargetRotation.Roll = 0.0f;
 
-		FRotator newRotation = FMath::RInterpTo(
+		FRotator SmoothedRotation = FMath::RInterpTo(
 			GetActorRotation(),
 			TargetRotation,
 			DeltaTime,
 			5.0f
 		);
 
+		//GroundCheck
+		FHitResult HitGround;
+		FVector StartGround = GetActorLocation() + FVector(0, 0, 50);
+		FVector EndGround = GetActorLocation() - FVector(0, 0, 200);
+
+		if (GetWorld()->LineTraceSingleByChannel(HitGround, StartGround, EndGround, ECC_Visibility))
+		{
+			FVector GroundPos = HitGround.ImpactPoint + FVector(0, 0, 5.f);
+			SetActorLocation(FVector(newLocation.X, newLocation.Y, GroundPos.Z));
+
+			FVector vectorUp = HitGround.ImpactNormal;
+			FVector vectorForward = SmoothedRotation.Vector();
+			newRotation = UKismetMathLibrary::MakeRotFromXZ(vectorForward, vectorUp);
+		}
+		else {
+			FHitResult hitSky;
+			FVector startSky = GetActorLocation() + FVector(0, 0, 50);
+			FVector endSky = GetActorLocation() + FVector(0, 0, 500);
+			if (GetWorld()->LineTraceSingleByChannel(hitSky, startSky, endSky, ECC_Visibility))
+			{
+				FVector GroundPos = hitSky.ImpactPoint + FVector(0, 0, 5.f);
+				SetActorLocation(FVector(newLocation.X, newLocation.Y, GroundPos.Z));
+			}
+		}
 		SetActorRotation(newRotation);
 	}
-	//GroundCheck
-	FHitResult HitGround;
-	FVector StartGround = GetActorLocation() + FVector(0, 0, 50);
-	FVector EndGround = GetActorLocation() - FVector(0, 0, 500);
-
-	if (GetWorld()->LineTraceSingleByChannel(HitGround, StartGround, EndGround, ECC_Visibility))
-	{
-		FVector GroundPos = HitGround.ImpactPoint + FVector(0, 0, 5.f);
-		SetActorLocation(FVector(NewLocation.X, NewLocation.Y, GroundPos.Z));
-	}
-	else {
-		FHitResult HitSky;
-		FVector StartSky = GetActorLocation() + FVector(0, 0, 50);
-		FVector EndSky = GetActorLocation() + FVector(0, 0, 500);
-		if (GetWorld()->LineTraceSingleByChannel(HitSky, StartSky, EndSky, ECC_Visibility))
-		{
-			FVector GroundPos = HitSky.ImpactPoint + FVector(0, 0, 5.f);
-			SetActorLocation(FVector(NewLocation.X, NewLocation.Y, GroundPos.Z));
-		}
-	}
-
 	//UE_LOG(LogTemp, Warning, TEXT("Boid %s velocity: %s"), *GetName(), *Velocity.ToString());
 }
 
@@ -95,11 +101,38 @@ void ASwarm_entity::HandleTimer()
 
 void ASwarm_entity::HandleAnimtation()
 {
-
+	switch (CurrentState)
+	{
+	case::EBehaviorState::Eating:
+	{
+		Eat();
+		break;
+	}
+	case::EBehaviorState::Drinking:
+	{
+		Drink();
+		break;
+	}
+	case::EBehaviorState::Sleepy:
+	{
+		Sleep();
+		break;
+	}
+	case::EBehaviorState::Hunting:
+	{
+		Attack();
+		break;
+	}
+	}
 }
 
 void ASwarm_entity::AnimationTimer()
 {
+	if (GetWorld()->GetTimerManager().IsTimerActive(EntityAnimationTime))
+	{
+		return;
+	}
+
 	switch (CurrentState)
 	{
 	case::EBehaviorState::Eating:
@@ -135,6 +168,17 @@ void ASwarm_entity::AnimationTimer()
 		);
 		break;
 	}
+	case::EBehaviorState::Hunting:
+	{
+		GetWorld()->GetTimerManager().SetTimer(
+			EntityAnimationTime,
+			this,
+			&ASwarm_entity::HandleAnimtation,
+			DrinkAnimation,
+			false
+		);
+		break;
+	}
 	}
 }
 
@@ -152,6 +196,21 @@ void ASwarm_entity::UpdateEntity(const FVector& NewVelocity)
 		Velocity = NewVelocity.GetClampedToMaxSize(WalkingVelocity);
 		break;
 	}
+	case::EBehaviorState::Drinking:
+	{
+		Velocity = NewVelocity.GetClampedToMaxSize(RunningVelocity);
+		break;
+	}
+	case::EBehaviorState::Eating:
+	{
+		Velocity = NewVelocity.GetClampedToMaxSize(RunningVelocity);
+		break;
+	}
+	case::EBehaviorState::Sleepy:
+	{
+		Velocity = NewVelocity.GetClampedToMaxSize(WalkingVelocity);
+		break;
+	}
 	default:
 	{
 		Velocity = FVector(0, 0, 0);
@@ -159,3 +218,5 @@ void ASwarm_entity::UpdateEntity(const FVector& NewVelocity)
 	}
 	}
 }
+
+

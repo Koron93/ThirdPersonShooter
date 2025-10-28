@@ -1,10 +1,10 @@
-Log started at 10/24/2025 18:46:44 (2025-10-24T16:46:44Z)
+Log started at 10/28/2025 14:33:43 (2025-10-28T13:33:43Z)
 No config file at C:\ProgramData\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
 No config file at C:\Users\Tanso\AppData\Local\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
 No config file at C:\Users\Tanso\OneDrive\Dokument\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
 Configuration will be read from:
   C:\Users\Tanso\AppData\Roaming\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
-Log file: C:\Users\Tanso\OneDrive\Dokument\GitHub\ThirdPersonShooter\ThirdPersonShooter\Saved\Logs\UnrealVersionSelector-2025.10.24-18.46.43.log
+Log file: C:\Users\Tanso\OneDrive\Dokument\GitHub\ThirdPersonShooter\ThirdPersonShooter\Saved\Logs\UnrealVersionSelector-2025.10.28-14.33.39.log
 
 Setting temp directory to 'C:\Users\Tanso\AppData\Local\Temp\UnrealBuildTool\5776fc56'
     Registering build platform: UnrealBuildTool.AndroidPlatformFactory
@@ -23,7 +23,7 @@ Win64 Installed SDK(s): MinVersion_Sdk=10.0.19041.0, MaxVersion_Sdk=10.9.99999.0
         Registering build platform: Win64 - buildable: True
     Registering build platform: UnrealBuildTool.VisionOSPlatformFactory
 Log file: C:\Users\Tanso\AppData\Local\UnrealBuildTool\Log_GPF.txt
-Deleting old log file: C:\Users\Tanso\AppData\Local\UnrealBuildTool\Log_GPF-backup-2025.06.01-08.25.04.txt
+Deleting old log file: C:\Users\Tanso\AppData\Local\UnrealBuildTool\Log_GPF-backup-2025.06.01-08.41.27.txt
 Resolved project argument C:/Users/Tanso/OneDrive/Dokument/GitHub/ThirdPersonShooter/ThirdPersonShooter/ThirdPersonShooter.uproject to C:\Users\Tanso\OneDrive\Dokument\GitHub\ThirdPersonShooter\ThirdPersonShooter\ThirdPersonShooter.uproject
 Registering project generator UnrealBuildTool.AndroidProjectGenerator for Android
 Skipping project file generator registration for Android due to no valid BuildPlatform.
@@ -3978,9 +3978,9 @@ Found 5 shared PCH headers (listed in order of preference):
   CppStandard Cpp17 cannot use PCHUsage UseExplicitOrSharedPCHs. Overriding to NoPCHs for LiveCodingServer
   CppStandard Cpp17 cannot use PCHUsage UseExplicitOrSharedPCHs. Overriding to NoPCHs for ChaosCachingUSD
   CppStandard Cpp17 cannot use PCHUsage UseExplicitOrSharedPCHs. Overriding to NoPCHs for UnrealUSDWrapper
-  CppStandard Cpp17 cannot use PCHUsage UseExplicitOrSharedPCHs. Overriding to NoPCHs for TraceAnalysis
   CppStandard Cpp17 cannot use PCHUsage UseExplicitOrSharedPCHs. Overriding to NoPCHs for Reflex
   CppStandard Cpp17 cannot use PCHUsage UseExplicitOrSharedPCHs. Overriding to NoPCHs for NNERuntimeRDG
+  CppStandard Cpp17 cannot use PCHUsage UseExplicitOrSharedPCHs. Overriding to NoPCHs for TraceAnalysis
 @progress 'Binding IntelliSense data...' 50%
 Found target: ThirdPersonShooterEditor
 Building UnrealEditor - ThirdPersonShooterEditor - Win64 - Development
@@ -4396,10 +4396,10 @@ Saved .vsconfig
 Project generation complete (2 generated, 50 imported)
 
 Generating QueryTargets data for editor...
-Total execution time: 56.85 seconds
+Total execution time: 154.58 seconds
 WriteFileIfChanged() wrote 32 changed files of 1797 requested writes.
 Timeline:
 
 [ 0.000]
-[ 0.000](+56.853) <unknown>
-[56.853]
+[ 0.000](+154.581) <unknown>
+[154.581]

@@ -49,6 +49,34 @@ public:
 	UFUNCTION()
 	void UpdateEntity(const FVector& NewVelocity);
 
+	UPROPERTY(BlueprintReadWrite)
+	AActor* BodyOfIntrest = nullptr;
+
+	UFUNCTION(BlueprintCallable)
+	void AnimationTimer();
+
+	FVector GetVelocity() const { return Velocity; }
+	void SetVelocity(const FVector& newVel) { Velocity = newVel; }
+
+private:
+	UFUNCTION()
+	void CalcValues();
+
+	UFUNCTION()
+	void HandleTimer();
+
+	UFUNCTION()
+	void HandleAnimtation();
+
+	FTimerHandle EntityTimerHandle;
+
+	FTimerHandle EntityAnimationTime;
+
+	FVector Velocity;
+	const float WalkingVelocity = 200.f;
+	const float RunningVelocity = 800.f;
+
+protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void Attack();
 
@@ -69,28 +97,4 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float DrinkAnimation;
-
-	FVector GetVelocity() const { return Velocity; }
-	void SetVelocity(const FVector& newVel) { Velocity = newVel; }
-
-private:
-	UFUNCTION()
-	void CalcValues();
-
-	UFUNCTION()
-	void HandleTimer();
-
-	UFUNCTION()
-	void HandleAnimtation();
-
-	UFUNCTION()
-	void AnimationTimer();
-
-	FTimerHandle EntityTimerHandle;
-
-	FTimerHandle EntityAnimationTime;
-
-	FVector Velocity;
-	const float WalkingVelocity = 200.f;
-	const float RunningVelocity = 800.f;
 };
