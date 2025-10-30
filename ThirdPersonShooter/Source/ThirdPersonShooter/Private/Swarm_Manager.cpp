@@ -71,7 +71,7 @@ void ASwarm_Manager::Tick(float DeltaTime)
 
 		if (bIsHitLeft)
 		{
-			objectDistance += hitLeft.ImpactPoint - boidLocation;
+			objectDistance -= hitLeft.ImpactPoint - boidLocation;
 
 			DrawDebugSphere(
 				GetWorld(),
@@ -86,7 +86,7 @@ void ASwarm_Manager::Tick(float DeltaTime)
 
 		if (bIsHitRight)
 		{
-			objectDistance -= hitRight.ImpactPoint - boidLocation;
+			objectDistance += hitRight.ImpactPoint - boidLocation;
 
 			DrawDebugSphere(
 				GetWorld(),
