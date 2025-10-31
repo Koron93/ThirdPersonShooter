@@ -277,7 +277,13 @@ void ASwarm_Manager::Tick(float DeltaTime)
 			FVector AvgVelocity = FVector::ZeroVector;
 			FVector Separation = FVector::ZeroVector;
 			int32 NeighborCount = 0;
-			FVector targetLocation = Boid->BodyOfIntrest->GetActorLocation();
+			FVector targetLocation = GetActorLocation()  + 
+				FVector(
+				FMath::RandRange(-100.0f, 100.0f),
+				FMath::RandRange(-100.0f, 100.0f),
+					0
+			);;
+			if(Boid->BodyOfIntrest != nullptr)	targetLocation = Boid->BodyOfIntrest->GetActorLocation();
 
 			float DistanceToTarget = FMath::Abs(BoidLocation.X - targetLocation.X) + FMath::Abs(BoidLocation.Y - targetLocation.Y);
 			if (DistanceToTarget <= 50)

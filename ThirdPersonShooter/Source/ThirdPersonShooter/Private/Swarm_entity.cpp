@@ -44,7 +44,7 @@ void ASwarm_entity::Tick(float DeltaTime)
 
 	if (!direction.IsNearlyZero()) //Applie rotation over time
 	{
-		FRotator newRotation;
+		FRotator newRotation = GetActorRotation();
 
 		FRotator TargetRotation = direction.Rotation();
 		TargetRotation.Pitch = 0.0f;
