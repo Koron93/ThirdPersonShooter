@@ -38,12 +38,25 @@ public:
 
 
 private:
-	const int NumberOfBoids = 9;
-	const float BoidSpawnRadius = 400.f;
-	const float NeigborRadius = 200.f;
-	const float SeperationDistance = 100.f;
-	const float CohesionWeight = 0.5f;
-	const float AlignmentWeight = 0.2f;
-	const float SeparationWeight = 1.6f;
-	const float GlobalCohesionWeight = 1.01f;
+	TMap<FIntVector, TArray<ASwarm_entity*>> SpacialHash;
+	const float CellSize = 400.f;
+
+	FIntVector GetCellCoordinates(const FVector& aPosition)
+	{
+		return FIntVector(
+			FMath::FloorToInt(aPosition.X/ CellSize),
+			FMath::FloorToInt(aPosition.Y / CellSize),
+			0
+		);
+	}
+
+	void UpdateGrid();
+
+	const int NumberOfBoids = 15;
+	const float BoidSpawnRadius = 500.f;
+	const float SeperationDistance = 250.f;
+	const float CohesionWeight = 0.6f;
+	const float AlignmentWeight = 0.4f;
+	const float SeparationWeight = 1.8f;
+	const float GlobalCohesionWeight = 0.7f;
 };

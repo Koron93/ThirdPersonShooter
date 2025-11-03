@@ -33,6 +33,9 @@ void ASwarm_Manager::BeginPlay()
 void ASwarm_Manager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	UpdateGrid();
+
 	for (ASwarm_entity* Boid : Boids)
 	{
 		if (!Boid) continue;
@@ -99,13 +102,14 @@ void ASwarm_Manager::Tick(float DeltaTime)
 			);
 		}
 
-		if (Boid->CurrentState != EBehaviorState::Hunting)
+		/*if (Boid->CurrentState != EBehaviorState::Hunting)
 		{
 			if (Boid->Thirst <= 0) Boid -> CurrentState = EBehaviorState::Drinking;
 			else if (Boid->Hunger <= 0) Boid->CurrentState = EBehaviorState::Eating;
-		}
+		}*/
 		//UE_LOG(LogTemp, Warning, TEXT("Boid state: %s"), *UEnum::GetValueAsString(Boid->CurrentState));
 
+		TArray<ASwarm_entity*> Neighbors;
 		switch (Boid->CurrentState)
 		{
 		case::EBehaviorState::Patroling:
@@ -118,21 +122,23 @@ void ASwarm_Manager::Tick(float DeltaTime)
 			FVector Separation = FVector::ZeroVector;
 			int32 NeighborCount = 0;
 
-			for (ASwarm_entity* Other : Boids)
+			if (TArray<ASwarm_entity*>* CellEntities = SpacialHash.Find(GetCellCoordinates(Boid->GetActorLocation())))
 			{
-				if (Other == Boid) continue;
-
-				FVector ToOther = Other->GetActorLocation() - BoidLocation;
-				float Distance = ToOther.Size();
-
-				if (Distance < NeigborRadius)
+				 Neighbors = *CellEntities;
+			}
+			if (Neighbors.Num() > 0) {
+				for (ASwarm_entity* Other : Neighbors)
 				{
+					if (Other == Boid) continue;
+
+					FVector ToOther = Other->GetActorLocation() - BoidLocation;
+					float Distance = ToOther.Size();
 					AvgLocation += Other->GetActorLocation();
 					AvgVelocity += Other->GetVelocity();
 
 					if (Distance < SeperationDistance)
 					{
-						Separation -= ToOther.GetSafeNormal() / Distance;
+						Separation -= (ToOther.GetSafeNormal() / Distance) * 2;
 					}
 
 					NeighborCount++;
@@ -208,17 +214,17 @@ void ASwarm_Manager::Tick(float DeltaTime)
 				Boid->AnimationTimer();
 			}
 
-			for (ASwarm_entity* Other : Boids)
+			if (TArray<ASwarm_entity*>* CellEntities = SpacialHash.Find(GetCellCoordinates(Boid->GetActorLocation())))
 			{
-
-				if (Other == Boid ) continue;
-
-				Boid->BodyOfIntrest = Target;
-				FVector ToOther = Other->GetActorLocation() - BoidLocation;
-				float Distance = ToOther.Size();
-
-				if (Distance < NeigborRadius)
+				 Neighbors = *CellEntities;
+			}
+			if (Neighbors.Num() != 0) {
+				for (ASwarm_entity* Other : Neighbors)
 				{
+					if (Other == Boid) continue;
+
+					FVector ToOther = Other->GetActorLocation() - BoidLocation;
+					float Distance = ToOther.Size();
 					AvgLocation += Other->GetActorLocation();
 					AvgVelocity += Other->GetVelocity();
 
@@ -252,7 +258,7 @@ void ASwarm_Manager::Tick(float DeltaTime)
 					Cohesion * CohesionWeight +
 					Alignment * AlignmentWeight +
 					Separation * SeparationWeight +
-					(ToCenter.GetSafeNormal() * GlobalCohesionWeight) * 10 +
+					(ToCenter.GetSafeNormal() / GlobalCohesionWeight) +
 					objectDistance;
 
 				NewVelocity.Z = 0;
@@ -293,16 +299,17 @@ void ASwarm_Manager::Tick(float DeltaTime)
 			}
 			else
 			{
-
-				for (ASwarm_entity* Other : Boids) 
+				if (TArray<ASwarm_entity*>* CellEntities = SpacialHash.Find(GetCellCoordinates(Boid->GetActorLocation())))
 				{
-					if (Other == Boid || Other->CurrentState == EBehaviorState::Patroling) continue;
-
-					FVector ToOther = Other->GetActorLocation() - BoidLocation;
-					float Distance = ToOther.Size();
-
-					if (Distance < NeigborRadius)
+					Neighbors = *CellEntities;
+				}
+				if (Neighbors.Num() != 0) {
+					for (ASwarm_entity* Other : Neighbors)
 					{
+						if (Other == Boid) continue;
+
+						FVector ToOther = Other->GetActorLocation() - BoidLocation;
+						float Distance = ToOther.Size();
 						AvgLocation += Other->GetActorLocation();
 						AvgVelocity += Other->GetVelocity();
 
@@ -337,7 +344,7 @@ void ASwarm_Manager::Tick(float DeltaTime)
 						Cohesion * CohesionWeight +
 						Alignment * AlignmentWeight +
 						Separation * SeparationWeight +
-						(ToCenter.GetSafeNormal() * GlobalCohesionWeight) +
+						(ToCenter.GetSafeNormal() / GlobalCohesionWeight) +
 						objectDistance;
 
 					NewVelocity.Z = 0;
@@ -365,3 +372,19 @@ void ASwarm_Manager::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
+void ASwarm_Manager::UpdateGrid()
+{
+	SpacialHash.Empty();
+
+	for (ASwarm_entity* Entity : Boids)
+	{
+		if (!Entity) continue;
+
+		FVector pos = Entity->GetActorLocation();
+
+		FIntVector cell = GetCellCoordinates(pos);
+
+		TArray<ASwarm_entity*>& CellArray = SpacialHash.FindOrAdd(cell);
+		CellArray.Add(Entity);
+	}
+}

@@ -11,5 +11,5 @@ void AGameplay_GameState::SetGameState(EGameState aState)
 
 void AGameplay_GameState::OnRep_GameState()
 {
-
+	OnGameStateChanged.Broadcast(CurrentState);
 }

@@ -6,7 +6,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "Gameplay_GameState.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(OnRep_GameState(), EGameState)
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameStateChanged, EGameState)
 
 UENUM()
 enum class EGameState : uint8
@@ -31,4 +31,7 @@ public:
 protected:
 	UFUNCTION()
 	void OnRep_GameState();
+
+private:
+	FOnGameStateChanged OnGameStateChanged;
 };
