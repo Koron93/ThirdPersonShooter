@@ -101,7 +101,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float DrinkAnimation;
 
-	UPROPERTY(BlueprintReadOnly)
-	bool bIsNotSleeping;
+	bool bIsNotSleeping = true;
 	void StopSleep();
 };

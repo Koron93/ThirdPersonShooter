@@ -10,7 +10,6 @@ ASwarm_entity::ASwarm_entity()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	bIsNotSleeping = true;
 	CurrentState = EBehaviorState::Patroling; 
 	Hunger = FMath::RandRange(50, 150);
 	Thirst = FMath::RandRange(50, 150);
@@ -47,29 +46,29 @@ void ASwarm_entity::Tick(float DeltaTime)
 	{
 		FRotator newRotation = GetActorRotation();
 
-		FRotator targetRotation = direction.Rotation();
-		targetRotation.Pitch = 0.0f;
-		targetRotation.Roll = 0.0f;
+		FRotator TargetRotation = direction.Rotation();
+		TargetRotation.Pitch = 0.0f;
+		TargetRotation.Roll = 0.0f;
 
-		FRotator smoothedRotation = FMath::RInterpTo(
+		FRotator SmoothedRotation = FMath::RInterpTo(
 			GetActorRotation(),
-			targetRotation,
+			TargetRotation,
 			DeltaTime,
 			5.0f
 		);
 
 		//GroundCheck
-		FHitResult hitGround;
-		FVector startGround = GetActorLocation() + FVector(0, 0, 50);
-		FVector endGround = GetActorLocation() - FVector(0, 0, 200);
+		FHitResult HitGround;
+		FVector StartGround = GetActorLocation() + FVector(0, 0, 50);
+		FVector EndGround = GetActorLocation() - FVector(0, 0, 200);
 
-		if (GetWorld()->LineTraceSingleByChannel(hitGround, startGround, endGround, ECC_Visibility))
+		if (GetWorld()->LineTraceSingleByChannel(HitGround, StartGround, EndGround, ECC_Visibility))
 		{
-			FVector groundPos = hitGround.ImpactPoint + FVector(0, 0, 5.f);
-			SetActorLocation(FVector(newLocation.X, newLocation.Y, groundPos.Z));
+			FVector GroundPos = HitGround.ImpactPoint + FVector(0, 0, 5.f);
+			SetActorLocation(FVector(newLocation.X, newLocation.Y, GroundPos.Z));
 
-			FVector vectorUp = hitGround.ImpactNormal;
-			FVector vectorForward = smoothedRotation.Vector();
+			FVector vectorUp = HitGround.ImpactNormal;
+			FVector vectorForward = SmoothedRotation.Vector();
 			newRotation = UKismetMathLibrary::MakeRotFromXZ(vectorForward, vectorUp);
 		}
 		else {
@@ -134,11 +133,11 @@ void ASwarm_entity::HandleAnimtation()
 
 void ASwarm_entity::AnimationTimer()
 {
-	if (GetWorld()->GetTimerManager().IsTimerActive(EntityAnimationTime) && CurrentState != EBehaviorState::Patroling)
+	if (GetWorld()->GetTimerManager().IsTimerActive(EntityAnimationTime))
 	{
 		return;
 	}
-
+	//Animation dont get called initially need to get called at the start then timer for continueations.
 	switch (CurrentState)
 	{
 	case::EBehaviorState::Eating:
@@ -195,7 +194,6 @@ void ASwarm_entity::AnimationTimer()
 	}
 	case::EBehaviorState::Patroling:
 	{
-		GetWorld()->GetTimerManager().ClearTimer(EntityAnimationTime);
 		HandleAnimtation();
 		GetWorld()->GetTimerManager().SetTimer(
 			EntityAnimationTime,
