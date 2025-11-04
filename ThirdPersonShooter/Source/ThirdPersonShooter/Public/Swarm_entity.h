@@ -89,6 +89,9 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void Drink();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void DoneSleeping();
+
 	UPROPERTY(EditAnywhere)
 	float SleepAnimation;
 
@@ -97,4 +100,7 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float DrinkAnimation;
+
+	bool bIsNotSleeping = true;
+	void StopSleep();
 };

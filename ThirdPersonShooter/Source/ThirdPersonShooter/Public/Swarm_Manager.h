@@ -58,5 +58,6 @@ private:
 	const float CohesionWeight = 0.6f;
 	const float AlignmentWeight = 0.4f;
 	const float SeparationWeight = 1.8f;
-	const float GlobalCohesionWeight = 0.7f;
+	const float GlobalCohesionWeight = 0.8f;
+	const float AvoidanceStrenght = 0.1f;
 };

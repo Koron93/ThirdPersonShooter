@@ -11,9 +11,9 @@ ASwarm_entity::ASwarm_entity()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	CurrentState = EBehaviorState::Patroling; 
-	Hunger = FMath::RandRange(50, 400);
-	Thirst = FMath::RandRange(50, 350);
-	Rested = FMath::RandRange(50, 600);
+	Hunger = FMath::RandRange(50, 150);
+	Thirst = FMath::RandRange(50, 150);
+	Rested = FMath::RandRange(50, 150);
 }
 
 // Called when the game starts or when spawned
@@ -105,22 +105,27 @@ void ASwarm_entity::HandleAnimtation()
 	{
 	case::EBehaviorState::Eating:
 	{
-		Eat();
+		this->Eat();
 		break;
 	}
 	case::EBehaviorState::Drinking:
 	{
-		Drink();
+		this->Drink();
 		break;
 	}
 	case::EBehaviorState::Sleepy:
 	{
-		Sleep();
+		this->Sleep();
 		break;
 	}
 	case::EBehaviorState::Hunting:
 	{
-		Attack();
+		this->Attack();
+		break;
+	}
+	case::EBehaviorState::Patroling:
+	{
+		this->DoneSleeping();
 		break;
 	}
 	}
@@ -132,11 +137,12 @@ void ASwarm_entity::AnimationTimer()
 	{
 		return;
 	}
-
+	//Animation dont get called initially need to get called at the start then timer for continueations.
 	switch (CurrentState)
 	{
 	case::EBehaviorState::Eating:
 		{
+		HandleAnimtation();
 		GetWorld()->GetTimerManager().SetTimer(
 			EntityAnimationTime,
 			this,
@@ -144,10 +150,13 @@ void ASwarm_entity::AnimationTimer()
 			EatAnimation,
 			false
 		);
+		Hunger += 70;
 			break;
 		}
 	case::EBehaviorState::Sleepy:
 		{
+		HandleAnimtation();
+		bIsNotSleeping = false;
 		GetWorld()->GetTimerManager().SetTimer(
 			EntityAnimationTime,
 			this,
@@ -155,10 +164,25 @@ void ASwarm_entity::AnimationTimer()
 			SleepAnimation,
 			false
 		);
+		Rested += 30;
 			break;
 		}
 	case::EBehaviorState::Drinking:
 	{
+		HandleAnimtation();
+		GetWorld()->GetTimerManager().SetTimer(
+			EntityAnimationTime,
+			this,
+			&ASwarm_entity::HandleAnimtation,
+			DrinkAnimation,
+			false
+		);
+		Thirst += 60;
+		break;
+	}
+	case::EBehaviorState::Hunting:
+	{
+		HandleAnimtation();
 		GetWorld()->GetTimerManager().SetTimer(
 			EntityAnimationTime,
 			this,
@@ -168,13 +192,14 @@ void ASwarm_entity::AnimationTimer()
 		);
 		break;
 	}
-	case::EBehaviorState::Hunting:
+	case::EBehaviorState::Patroling:
 	{
+		HandleAnimtation();
 		GetWorld()->GetTimerManager().SetTimer(
 			EntityAnimationTime,
 			this,
-			&ASwarm_entity::HandleAnimtation,
-			DrinkAnimation,
+			&ASwarm_entity::StopSleep,
+			SleepAnimation,
 			false
 		);
 		break;
@@ -182,40 +207,47 @@ void ASwarm_entity::AnimationTimer()
 	}
 }
 
+void ASwarm_entity::StopSleep()
+{
+	bIsNotSleeping = true;
+}
+
 void ASwarm_entity::UpdateEntity(const FVector& NewVelocity)
 {
-	switch (CurrentState)
-	{
-	case::EBehaviorState::Hunting:
-	{
-		Velocity = NewVelocity.GetClampedToMaxSize(RunningVelocity);
-		break;
-	}
-	case::EBehaviorState::Patroling:
-	{
-		Velocity = NewVelocity.GetClampedToMaxSize(WalkingVelocity);
-		break;
-	}
-	case::EBehaviorState::Drinking:
-	{
-		Velocity = NewVelocity.GetClampedToMaxSize(RunningVelocity);
-		break;
-	}
-	case::EBehaviorState::Eating:
-	{
-		Velocity = NewVelocity.GetClampedToMaxSize(RunningVelocity);
-		break;
-	}
-	case::EBehaviorState::Sleepy:
-	{
-		Velocity = NewVelocity.GetClampedToMaxSize(WalkingVelocity);
-		break;
-	}
-	default:
-	{
-		Velocity = FVector(0, 0, 0);
-		break;
-	}
+	if (bIsNotSleeping == true) {
+		switch (CurrentState)
+		{
+		case::EBehaviorState::Hunting:
+		{
+			Velocity = NewVelocity.GetClampedToMaxSize(RunningVelocity);
+			break;
+		}
+		case::EBehaviorState::Patroling:
+		{
+			Velocity = NewVelocity.GetClampedToMaxSize(WalkingVelocity);
+			break;
+		}
+		case::EBehaviorState::Drinking:
+		{
+			Velocity = NewVelocity.GetClampedToMaxSize(RunningVelocity);
+			break;
+		}
+		case::EBehaviorState::Eating:
+		{
+			Velocity = NewVelocity.GetClampedToMaxSize(RunningVelocity);
+			break;
+		}
+		case::EBehaviorState::Sleepy:
+		{
+			Velocity = NewVelocity.GetClampedToMaxSize(WalkingVelocity);
+			break;
+		}
+		default:
+		{
+			Velocity = FVector(0, 0, 0);
+			break;
+		}
+		}
 	}
 }
 
