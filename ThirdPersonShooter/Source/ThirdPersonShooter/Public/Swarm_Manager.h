@@ -52,6 +52,8 @@ private:
 
 	void UpdateGrid();
 
+	TArray<ASwarm_entity*> GetNeighbors(FVector aVector);
+
 	const int NumberOfBoids = 15;
 	const float BoidSpawnRadius = 500.f;
 	const float SeperationDistance = 250.f;

@@ -157,10 +157,7 @@ void ASwarm_Manager::Tick(float DeltaTime)
 			FVector Separation = FVector::ZeroVector;
 			int32 NeighborCount = 0;
 
-			if (TArray<ASwarm_entity*>* CellEntities = SpacialHash.Find(GetCellCoordinates(Boid->GetActorLocation())))
-			{
-				 Neighbors = *CellEntities;
-			}
+			Neighbors = GetNeighbors(Boid->GetActorLocation());
 			if (Neighbors.Num() > 0) {
 				for (ASwarm_entity* Other : Neighbors)
 				{
@@ -244,19 +241,8 @@ void ASwarm_Manager::Tick(float DeltaTime)
 			FVector Separation = FVector::ZeroVector;
 			int32 NeighborCount = 0;
 
-			FVector targetLocation = Boid->BodyOfIntrest->GetActorLocation();
-
-			float DistanceToTarget = FMath::Abs(BoidLocation.X - targetLocation.X) + FMath::Abs(BoidLocation.Y - targetLocation.Y);
-			if (DistanceToTarget <= 100)
-			{
-				Boid->AnimationTimer();
-			}
-
-			if (TArray<ASwarm_entity*>* CellEntities = SpacialHash.Find(GetCellCoordinates(Boid->GetActorLocation())))
-			{
-				 Neighbors = *CellEntities;
-			}
-			if (Neighbors.Num() != 0) {
+			Neighbors = GetNeighbors(Boid->GetActorLocation());
+			if (Neighbors.Num() > 0) {
 				for (ASwarm_entity* Other : Neighbors)
 				{
 					if (Other == Boid) continue;
@@ -268,12 +254,14 @@ void ASwarm_Manager::Tick(float DeltaTime)
 
 					if (Distance < SeperationDistance)
 					{
-						Separation -= ToOther.GetSafeNormal() / Distance;
+						Separation -= (ToOther.GetSafeNormal() / Distance) * 2;
 					}
 
 					NeighborCount++;
 				}
 			}
+
+			FVector targetLocation = Target->GetActorLocation();
 
 			FVector NewVelocity;
 
@@ -344,11 +332,8 @@ void ASwarm_Manager::Tick(float DeltaTime)
 			}
 			else
 			{
-				if (TArray<ASwarm_entity*>* CellEntities = SpacialHash.Find(GetCellCoordinates(Boid->GetActorLocation())))
-				{
-					Neighbors = *CellEntities;
-				}
-				if (Neighbors.Num() != 0) {
+				Neighbors = GetNeighbors(Boid->GetActorLocation());
+				if (Neighbors.Num() > 0) {
 					for (ASwarm_entity* Other : Neighbors)
 					{
 						if (Other == Boid) continue;
@@ -360,7 +345,7 @@ void ASwarm_Manager::Tick(float DeltaTime)
 
 						if (Distance < SeperationDistance)
 						{
-							Separation -= ToOther.GetSafeNormal() / Distance;
+							Separation -= (ToOther.GetSafeNormal() / Distance) * 2;
 						}
 
 						NeighborCount++;
@@ -416,19 +401,39 @@ void ASwarm_Manager::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
+TArray<ASwarm_entity*> ASwarm_Manager::GetNeighbors(FVector aVector)
+{
+
+	FIntVector baseCell = GetCellCoordinates(aVector);
+	TArray<ASwarm_entity*> neighbors;
+
+	for (int x = -1; x <= 1; x++)
+	{
+		for (int y = -1; y <= 1; y++)
+		{
+			FIntVector neighborCell = baseCell + FIntVector(x, y, 0);
+			if (TArray<ASwarm_entity*>* Cell = SpacialHash.Find(neighborCell))
+			{
+				neighbors.Append(*Cell);
+			}
+		}
+	}
+	return neighbors;
+}
+
 void ASwarm_Manager::UpdateGrid()
 {
 	SpacialHash.Empty();
 
-	for (ASwarm_entity* Entity : Boids)
+	for (ASwarm_entity* entity : Boids)
 	{
-		if (!Entity) continue;
+		if (!entity) continue;
 
-		FVector pos = Entity->GetActorLocation();
+		FVector pos = entity->GetActorLocation();
 
 		FIntVector cell = GetCellCoordinates(pos);
 
 		TArray<ASwarm_entity*>& CellArray = SpacialHash.FindOrAdd(cell);
-		CellArray.Add(Entity);
+		CellArray.Add(entity);
 	}
 }
