@@ -281,9 +281,9 @@ void ASwarm_Manager::Tick(float DeltaTime)
 
 				NewVelocity =
 					Boid->GetVelocity() +
-					Cohesion * CohesionWeight +
-					Alignment * AlignmentWeight +
-					Separation * SeparationWeight +
+					(Cohesion * CohesionWeight) +
+					(Alignment * AlignmentWeight) +
+					(Separation * SeparationWeight) +
 					(ToCenter.GetSafeNormal() / GlobalCohesionWeight) +
 					objectAvoidance;
 
@@ -292,7 +292,8 @@ void ASwarm_Manager::Tick(float DeltaTime)
 			}
 			else // if there is no neighbor
 			{
-				NewVelocity = (targetLocation - BoidLocation).GetSafeNormal() * 1000;
+				NewVelocity = (targetLocation - BoidLocation).GetSafeNormal() +
+					objectAvoidance;
 				//UE_LOG(LogTemp, Warning, TEXT("Boid %s"), *Boid->GetName());
 			}
 
@@ -371,9 +372,9 @@ void ASwarm_Manager::Tick(float DeltaTime)
 
 					NewVelocity =
 						Boid->GetVelocity() +
-						Cohesion * CohesionWeight +
-						Alignment * AlignmentWeight +
-						Separation * SeparationWeight +
+						(Cohesion * CohesionWeight) +
+						(Alignment * AlignmentWeight) +
+						(Separation * SeparationWeight) +
 						(ToCenter.GetSafeNormal() / GlobalCohesionWeight) +
 						objectAvoidance;
 
@@ -382,7 +383,8 @@ void ASwarm_Manager::Tick(float DeltaTime)
 				}
 				else
 				{
-					NewVelocity = targetLocation - BoidLocation.GetSafeNormal();
+					NewVelocity = targetLocation - BoidLocation.GetSafeNormal() +
+						objectAvoidance;
 				}
 
 				Boid->UpdateEntity(NewVelocity);
