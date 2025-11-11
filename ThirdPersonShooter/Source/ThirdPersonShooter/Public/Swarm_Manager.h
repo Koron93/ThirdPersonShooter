@@ -39,7 +39,7 @@ public:
 
 private:
 	TMap<FIntVector, TArray<ASwarm_entity*>> SpacialHash;
-	const float CellSize = 400.f;
+	const float CellSize = 300.f;
 
 	FIntVector GetCellCoordinates(const FVector& aPosition)
 	{

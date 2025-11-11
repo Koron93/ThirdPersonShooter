@@ -2,6 +2,8 @@
 
 
 #include "Swarm_Manager.h"
+#include "SplinePathManager.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ASwarm_Manager::ASwarm_Manager()
@@ -16,6 +18,10 @@ ASwarm_Manager::ASwarm_Manager()
 void ASwarm_Manager::BeginPlay()
 {
 	Super::BeginPlay();
+
+	AActor* splineActor = UGameplayStatics::GetActorOfClass(GetWorld(), USplinePathManager::StaticClass());
+	USplinePathManager* SplinePath = Cast<USplinePathManager>(splineActor);
+
 	for (int i = 0; i < NumberOfBoids; i++)
 	{
 		FVector SpawnLocation = FVector(GetActorLocation().X + FMath::RandRange(-BoidSpawnRadius, BoidSpawnRadius), GetActorLocation().Y + FMath::RandRange(-BoidSpawnRadius, BoidSpawnRadius), 0);
@@ -145,37 +151,36 @@ void ASwarm_Manager::Tick(float DeltaTime)
 		//UE_LOG(LogTemp, Warning, TEXT("Boid state: %s"), *UEnum::GetValueAsString(Boid->CurrentState));
 
 		TArray<ASwarm_entity*> Neighbors;
+		FVector BoidLocation = Boid->GetActorLocation();
+
+		FVector AvgLocation = FVector::ZeroVector;
+		FVector AvgVelocity = FVector::ZeroVector;
+		FVector Separation = FVector::ZeroVector;
+		int32 NeighborCount = 0;
+
+		Neighbors = GetNeighbors(Boid->GetActorLocation());
+		if (Neighbors.Num() > 0) {
+			for (ASwarm_entity* Other : Neighbors)
+			{
+				if (Other == Boid) continue;
+
+				FVector ToOther = Other->GetActorLocation() - BoidLocation;
+				float Distance = ToOther.Size();
+				AvgLocation += Other->GetActorLocation();
+				AvgVelocity += Other->GetVelocity();
+
+				if (Distance < SeperationDistance)
+				{
+					Separation -= (ToOther.GetSafeNormal() / Distance) * 2;
+				}
+
+				NeighborCount++;
+			}
+		}
 		switch (Boid->CurrentState)
 		{
 		case::EBehaviorState::Patroling:
 		{
-
-			FVector BoidLocation = Boid->GetActorLocation();
-
-			FVector AvgLocation = FVector::ZeroVector;
-			FVector AvgVelocity = FVector::ZeroVector;
-			FVector Separation = FVector::ZeroVector;
-			int32 NeighborCount = 0;
-
-			Neighbors = GetNeighbors(Boid->GetActorLocation());
-			if (Neighbors.Num() > 0) {
-				for (ASwarm_entity* Other : Neighbors)
-				{
-					if (Other == Boid) continue;
-
-					FVector ToOther = Other->GetActorLocation() - BoidLocation;
-					float Distance = ToOther.Size();
-					AvgLocation += Other->GetActorLocation();
-					AvgVelocity += Other->GetVelocity();
-
-					if (Distance < SeperationDistance)
-					{
-						Separation -= (ToOther.GetSafeNormal() / Distance) * 2;
-					}
-
-					NeighborCount++;
-				}
-			}
 
 			if (NeighborCount > 0) // movement if theres a neighbors
 			{
@@ -234,32 +239,7 @@ void ASwarm_Manager::Tick(float DeltaTime)
 		}
 		case::EBehaviorState::Hunting:
 		{
-			FVector BoidLocation = Boid->GetActorLocation();
 			Target = Boid->BodyOfIntrest;
-			FVector AvgLocation = FVector::ZeroVector;
-			FVector AvgVelocity = FVector::ZeroVector;
-			FVector Separation = FVector::ZeroVector;
-			int32 NeighborCount = 0;
-
-			Neighbors = GetNeighbors(Boid->GetActorLocation());
-			if (Neighbors.Num() > 0) {
-				for (ASwarm_entity* Other : Neighbors)
-				{
-					if (Other == Boid) continue;
-
-					FVector ToOther = Other->GetActorLocation() - BoidLocation;
-					float Distance = ToOther.Size();
-					AvgLocation += Other->GetActorLocation();
-					AvgVelocity += Other->GetVelocity();
-
-					if (Distance < SeperationDistance)
-					{
-						Separation -= (ToOther.GetSafeNormal() / Distance) * 2;
-					}
-
-					NeighborCount++;
-				}
-			}
 
 			FVector targetLocation = Target->GetActorLocation();
 
@@ -311,12 +291,6 @@ void ASwarm_Manager::Tick(float DeltaTime)
 		}
 		default:
 		{
-			FVector BoidLocation = Boid->GetActorLocation();
-
-			FVector AvgLocation = FVector::ZeroVector;
-			FVector AvgVelocity = FVector::ZeroVector;
-			FVector Separation = FVector::ZeroVector;
-			int32 NeighborCount = 0;
 			FVector targetLocation = GetActorLocation()  + 
 				FVector(
 				FMath::RandRange(-100.0f, 100.0f),
@@ -333,25 +307,6 @@ void ASwarm_Manager::Tick(float DeltaTime)
 			}
 			else
 			{
-				Neighbors = GetNeighbors(Boid->GetActorLocation());
-				if (Neighbors.Num() > 0) {
-					for (ASwarm_entity* Other : Neighbors)
-					{
-						if (Other == Boid) continue;
-
-						FVector ToOther = Other->GetActorLocation() - BoidLocation;
-						float Distance = ToOther.Size();
-						AvgLocation += Other->GetActorLocation();
-						AvgVelocity += Other->GetVelocity();
-
-						if (Distance < SeperationDistance)
-						{
-							Separation -= (ToOther.GetSafeNormal() / Distance) * 2;
-						}
-
-						NeighborCount++;
-					}
-				}
 
 				FVector NewVelocity;
 

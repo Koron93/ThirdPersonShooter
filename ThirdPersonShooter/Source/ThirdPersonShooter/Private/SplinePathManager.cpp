@@ -19,17 +19,17 @@ void USplinePathManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	int numberOfSplines = FMath::RandRange(5, 10);
+	int numberOfSplines = FMath::RandRange(3, 5);
 	for (int i = 0; i < numberOfSplines; i++)
 	{
-		int numberOfPoints = FMath::RandRange(5, 12);
+		int numberOfPoints = FMath::RandRange(3, 9);
 		float splinePathOffset = 2 * PI / numberOfSplines;
 
 		FSplinePath currentPath;
 
 		currentPath.NumberOfPoints = numberOfPoints;
 		currentPath.Points.SetNum(numberOfPoints);
-		float splineSize = FMath::RandRange(75000.f, 100000.f);
+		float splineSize = FMath::RandRange(50000.f, 50000.f);
 
 		float direction = (splinePathOffset * i);
 		FVector newDirection = FVector(
@@ -40,25 +40,24 @@ void USplinePathManager::BeginPlay()
 		
 		for (int y = 0; y < numberOfPoints; y++)
 		{
-			
 			FVector baseVector = (newDirection * splineSize * y / (numberOfPoints - 1));
 
-			float pointCurve = FMath::RandRange(0.f, 2 * PI);
-
-			if (y < numberOfPoints - 1 || y > 0)
-			{
-				FVector perp = FVector(-newDirection.Y, newDirection.X, 0.f).GetSafeNormal();
-				float aCurve = FMath::RandRange(-10000, 10000);
-
-				currentPath.Points[y] = baseVector + perp * aCurve;
-			}
-			else if (y == 0)
+			if (y == 0)
 			{
 				currentPath.Points[y] = FVector(0, 0, 0);
+				continue;
 			}
-			else {
+			else if(y == numberOfPoints - 1)
+			{
 				currentPath.Points[y] = baseVector;
+				continue;
 			}
+
+			float pointCurve = FMath::RandRange(0.f, 2 * PI);
+			FVector perp = FVector(-newDirection.Y, newDirection.X, 0.f).GetSafeNormal();
+			float aCurve = FMath::RandRange(-10000, 10000);
+
+			currentPath.Points[y] = baseVector + perp * aCurve;
 		}
 
 		SplineData.Add(currentPath);
@@ -71,7 +70,7 @@ void USplinePathManager::BeginPlay()
 				GetWorld(),
 				SplineData[x].Points[y],
 				SplineData[x].Points[y + 1],
-				FColor::Yellow,
+				FColor::Green,
 				true,
 				5.f,
 				0,
@@ -92,4 +91,3 @@ void USplinePathManager::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 	// ...
 }
-
